@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fun 3D Shapes Quiz: The Ellipsoid!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background-color: #F0F9FF;
+        }
+        .btn-bounce {
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+        .btn-bounce:active {
+            transform: scale(0.96);
+        }
+        .shadow-custom {
+            box-shadow: 0 8px 0px rgba(0, 0, 0, 0.15);
+        }
+        .shadow-custom-sm {
+            box-shadow: 0 4px 0px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Main Container -->
+    <div class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 max-w-2xl w-full border-4 border-sky-300 relative overflow-hidden">
+        
+        <!-- Top Bar / Header -->
+        <div id="quiz-header" class="flex flex-wrap justify-between items-center mb-6 pb-4 border-b-4 border-sky-100 gap-2">
+            <div class="bg-amber-100 text-amber-800 font-bold px-4 py-2 rounded-2xl text-lg sm:text-xl border-2 border-amber-300 shadow-custom-sm">
+                ⭐ Score: <span id="score">0</span> / 8
+            </div>
+            <div class="bg-sky-100 text-sky-800 font-bold px-4 py-2 rounded-2xl text-lg sm:text-xl border-2 border-sky-300 shadow-custom-sm">
+                📌 <span id="progress">Question 1 of 8</span>
+            </div>
+        </div>
+
+        <!-- Question View Container -->
+        <div id="question-container" class="space-y-6">
+            
+            <!-- Question Text -->
+            <h2 id="question-text" class="text-2xl sm:text-3xl font-bold text-slate-800 text-center leading-snug">
+                Question text goes here...
+            </h2>
+
+            <!-- SVG Illustration Container -->
+            <div id="illustration-container" class="flex justify-center my-4 hidden">
+                <div class="bg-amber-50 border-4 border-amber-200 rounded-2xl p-4 shadow-inner flex flex-col items-center">
+                    <svg id="ellipsoid-svg" width="220" height="130" viewBox="0 0 220 130" class="drop-shadow-md">
+                        <!-- Ellipsoid Outline -->
+                        <ellipse cx="110" cy="65" rx="95" ry="50" fill="#FF8A65" stroke="#D84315" stroke-width="5" />
+                        <!-- Curved shading line 1 -->
+                        <path d="M 25 65 A 85 30 0 0 0 195 65" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-dasharray="6,6" opacity="0.8" />
+                        <!-- Curved shading line 2 -->
+                        <path d="M 15 65 A 95 45 0 0 0 205 65" fill="none" stroke="#D84315" stroke-width="3" opacity="0.4" />
+                        <!-- Highlights -->
+                        <ellipse cx="80" cy="40" rx="35" ry="12" fill="#FFFFFF" opacity="0.3" transform="rotate(-10 80 40)" />
+                    </svg>
+                    <span class="text-xs font-bold text-amber-700 mt-2">🔍 3D Shape Model</span>
+                </div>
+            </div>
+
+            <!-- Answer Options Buttons -->
+            <div id="options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                <!-- Buttons will be dynamically inserted here -->
+            </div>
+
+            <!-- Feedback Display Area -->
+            <div id="feedback-area" class="hidden rounded-2xl p-4 sm:p-5 text-center text-lg sm:text-xl font-bold border-4 transition-all">
+                <div id="feedback-title" class="text-2xl sm:text-3xl mb-1"></div>
+                <div id="feedback-message" class="text-base sm:text-lg font-semibold mt-1"></div>
+                
+                <button id="next-btn" onclick="nextQuestion()" class="mt-4 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-8 rounded-2xl text-xl border-b-4 border-emerald-700 btn-bounce shadow-custom-sm inline-block">
+                    Next Question ➔
+                </button>
+            </div>
+        </div>
+
+        <!-- End Game View Container -->
+        <div id="end-container" class="hidden text-center space-y-6 py-6">
+            <div class="text-6xl animate-bounce">🎉</div>
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-800">Quiz Completed!</h2>
+            
+            <div class="bg-amber-100 border-4 border-amber-300 rounded-3xl p-6 shadow-inner max-w-md mx-auto">
+                <p class="text-xl text-amber-900 font-bold">Your Final Score:</p>
+                <p class="text-5xl font-black text-amber-600 my-2"><span id="final-score">0</span> / 8</p>
+                <p id="encouragement-msg" class="text-lg font-bold text-slate-700 mt-3"></p>
+            </div>
+
+            <button onclick="restartQuiz()" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-4 px-10 rounded-2xl text-2xl border-b-4 border-sky-700 btn-bounce shadow-custom">
+                🔄 Play Again
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "What is the name of this smooth 3D shape?",
+                showIllustration: true,
+                options: ["Sphere", "Ellipsoid", "Cube", "Cylinder"],
+                correct: 1,
+                explanation: "An ellipsoid looks like a stretched sphere or a 3D oval!"
+            },
+            {
+                question: "What kind of surface does an ellipsoid have?",
+                showIllustration: false,
+                options: ["Only flat faces", "One curved surface", "Flat and curved faces", "Spiky edges"],
+                correct: 1,
+                explanation: "An ellipsoid has one smooth, closed curved surface all around."
+            },
+            {
+                question: "How many flat faces does an ellipsoid have?",
+                showIllustration: false,
+                options: ["0", "2", "4", "6"],
+                correct: 0,
+                explanation: "An ellipsoid has zero flat faces! It is completely curved."
+            },
+            {
+                question: "How many sharp corners (vertices) does an ellipsoid have?",
+                showIllustration: false,
+                options: ["8 corners", "4 corners", "0 corners", "1 corner"],
+                correct: 2,
+                explanation: "An ellipsoid is smooth all over, so it has no vertices (corners)."
+            },
+            {
+                question: "Which everyday object looks most like an ellipsoid?",
+                showIllustration: false,
+                options: ["A square box", "A rugby ball", "A tea cup", "A party hat"],
+                correct: 1,
+                explanation: "A rugby ball is stretched out, making it look just like an ellipsoid!"
+            },
+            {
+                question: "How many straight edges does an ellipsoid have?",
+                showIllustration: false,
+                options: ["12 edges", "4 edges", "2 edges", "0 edges"],
+                correct: 3,
+                explanation: "An ellipsoid has zero straight edges. It is totally smooth!"
+            },
+            {
+                question: "How is an ellipsoid different from a sphere (like a basketball)?",
+                showIllustration: false,
+                options: [
+                    "It has sharp corners",
+                    "It is stretched out",
+                    "It has flat sides",
+                    "It has straight edges"
+                ],
+                correct: 1,
+                explanation: "A sphere is perfectly round, while an ellipsoid is elongated or squished."
+            },
+            {
+                question: "Which statement about an ellipsoid is mathematically true?",
+                showIllustration: false,
+                options: [
+                    "It has 6 flat faces and 8 corners",
+                    "It has 1 curved surface and 0 edges",
+                    "It has 2 flat faces and 1 edge",
+                    "It has 0 curved surfaces and 4 corners"
+                ],
+                correct: 1,
+                explanation: "Correct! An ellipsoid has 1 continuous curved surface, 0 flat faces, 0 edges, and 0 vertices."
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answeredCurrent = false;
+        let firstAttempt = true;
+
+        const buttonColors = [
+            { bg: "bg-rose-500", hover: "hover:bg-rose-600", border: "border-rose-700", text: "text-white" },
+            { bg: "bg-sky-500", hover: "hover:bg-sky-600", border: "border-sky-700", text: "text-white" },
+            { bg: "bg-amber-500", hover: "hover:bg-amber-600", border: "border-amber-700", text: "text-white" },
+            { bg: "bg-purple-500", hover: "hover:bg-purple-600", border: "border-purple-700", text: "text-white" }
+        ];
+
+        function loadQuestion() {
+            answeredCurrent = false;
+            firstAttempt = true;
+
+            const q = questions[currentQuestionIndex];
+            
+            document.getElementById("progress").textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+            document.getElementById("question-text").textContent = q.question;
+
+            // Illustration visibility
+            const illusContainer = document.getElementById("illustration-container");
+            if (q.showIllustration) {
+                illusContainer.classList.remove("hidden");
+            } else {
+                illusContainer.classList.add("hidden");
+            }
+
+            // Options container setup
+            const optionsContainer = document.getElementById("options-container");
+            optionsContainer.innerHTML = "";
+            optionsContainer.classList.remove("hidden");
+
+            q.options.forEach((optText, index) => {
+                const color = buttonColors[index % buttonColors.length];
+                const btn = document.createElement("button");
+                btn.className = `${color.bg} ${color.hover} ${color.text} font-bold py-4 px-4 rounded-2xl text-xl border-b-4 ${color.border} btn-bounce shadow-custom-sm text-center w-full transition-all flex items-center justify-center min-h-[70px]`;
+                btn.innerHTML = `<span>${optText}</span>`;
+                btn.onclick = () => checkAnswer(index, btn);
+                optionsContainer.appendChild(btn);
+            });
+
+            // Reset Feedback area
+            const feedbackArea = document.getElementById("feedback-area");
+            feedbackArea.classList.add("hidden");
+            feedbackArea.className = "hidden rounded-2xl p-4 sm:p-5 text-center text-lg sm:text-xl font-bold border-4 transition-all";
+        }
+
+        function checkAnswer(selectedIndex, btnElement) {
+            if (answeredCurrent) return;
+
+            const q = questions[currentQuestionIndex];
+            const feedbackArea = document.getElementById("feedback-area");
+            const feedbackTitle = document.getElementById("feedback-title");
+            const feedbackMsg = document.getElementById("feedback-message");
+            const optionsContainer = document.getElementById("options-container");
+
+            feedbackArea.classList.remove("hidden");
+
+            if (selectedIndex === q.correct) {
+                answeredCurrent = true;
+                if (firstAttempt) {
+                    score++;
+                    document.getElementById("score").textContent = score;
+                }
+
+                feedbackArea.classList.add("bg-emerald-100", "border-emerald-400", "text-emerald-900");
+                feedbackTitle.textContent = "🎉 Correct!";
+                feedbackMsg.textContent = q.explanation;
+                
+                // Highlight correct button
+                btnElement.classList.add("ring-4", "ring-emerald-400");
+
+                // Disable non-selected buttons
+                Array.from(optionsContainer.children).forEach((btn, idx) => {
+                    if (idx !== selectedIndex) {
+                        btn.style.opacity = "0.5";
+                        btn.disabled = true;
+                    }
+                });
+            } else {
+                firstAttempt = false;
+                feedbackArea.classList.add("bg-rose-100", "border-rose-400", "text-rose-900");
+                feedbackTitle.textContent = "❌ Try again!";
+                feedbackMsg.textContent = "That is not quite right. Give it another shot!";
+                
+                // Visually mark wrong attempt button
+                btnElement.style.opacity = "0.4";
+                btnElement.disabled = true;
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion();
+            } else {
+                showEndScreen();
+            }
+        }
+
+        function showEndScreen() {
+            document.getElementById("question-container").classList.add("hidden");
+            document.getElementById("quiz-header").classList.add("hidden");
+            
+            const endContainer = document.getElementById("end-container");
+            endContainer.classList.remove("hidden");
+
+            document.getElementById("final-score").textContent = score;
+
+            const msgElement = document.getElementById("encouragement-msg");
+            if (score === 8) {
+                msgElement.textContent = "🌟 Wow! Perfect Score! You are an Ellipsoid Expert!";
+            } else if (score >= 5) {
+                msgElement.textContent = "👍 Great Job! You know your 3D shapes really well!";
+            } else {
+                msgElement.textContent = "💪 Good Effort! Try again to get a perfect score!";
+            }
+        }
+
+        function restartQuiz() {
+            score = 0;
+            currentQuestionIndex = 0;
+            document.getElementById("score").textContent = "0";
+
+            document.getElementById("end-container").classList.add("hidden");
+            document.getElementById("quiz-header").classList.remove("hidden");
+            document.getElementById("question-container").classList.remove("hidden");
+
+            loadQuestion();
+        }
+
+        // Initialize quiz on load
+        loadQuestion();
+    </script>
+</body>
+</html>
+```eof
+
+I have created an interactive 8-question quiz web app designed specifically for primary school pupils exploring the 3D ellipsoid shape.
+
+### Key Features Included:
+- **Child-Friendly Design:** Features bold fonts, cheerful colors, high contrast, and large touch-friendly buttons.
+- **Progression & Scoring:** Questions range from simple shape identification to detailed mathematical properties (faces, vertices, edges). It awards 1 point for first-attempt correct answers and displays real-time progress (`Question X of 8`).
+- **3D SVG Illustration:** Features an accurate, visually clear SVG illustration of an elongated ellipsoid (rugby ball shape) for Question 1.
+- **Instant Feedback:** Displays clear "Correct!" or "Try again!" prompts after each attempt with mathematical explanations.
+- **End Summary:** Shows final score out of 8, an encouraging badge message, and a "Play Again" button.
